@@ -1,8 +1,5 @@
-//import processing.opengl.*; //<>// //<>// //<>//
 import java.awt.event.KeyEvent;
-//import processing.video.*;
 import java.awt.AWTException;
-//import processing.core.*;
 import processing.net.*;
 import java.net.InetAddress;
 
@@ -72,7 +69,7 @@ boolean editFramePos = false;
 boolean editFrameSize = false;
 boolean dontShowStartupScreenAnymore = false;
 boolean hideControlWindow = false;
-boolean licenseOK = false;
+boolean licenseOK = true;
 
 String pass = "";
 String realPass = "BodgedButWorks";
@@ -81,10 +78,6 @@ String myIP;
 
 PImage miniImage;
 PImage AeroTraxBall;
-
-
-
-
 
 void setup() {
   fullScreen(2);                 // Start on primary Display, Remove Window Frame/Border
@@ -157,7 +150,6 @@ void setup() {
   pix[31]  = loadImage("Blaize presets -15.png");
   AeroTraxBall = loadImage("AeroTrax Sphere Logo.png");
 
-
   //Fusion of 16 small images to one large in a separate canvas, which is later "pasted" as an image with image(page1presetPix, x, y)
   page1presetPix = createGraphics(cmdWindowWidth, frameSizeY);
   page1presetPix.beginDraw();
@@ -169,7 +161,6 @@ void setup() {
   }
 
   page1presetPix.endDraw();
-
 
   page2presetPix = createGraphics(cmdWindowWidth, frameSizeY);
   page2presetPix.beginDraw();
@@ -183,7 +174,6 @@ void setup() {
   page2presetPix.endDraw();
 
   //QuadPhaseLED = createGraphics(20, 20);
-
 
   S[32] = new rectbutton(color(255, 0, 0), 0*(cmdWindowWidth-10)/8+5, 4*85+5, (cmdWindowWidth)/8, 80, 0, "COLOR");    // Red
   S[33] = new rectbutton(color(255, 255, 0), 1*(cmdWindowWidth-10)/8+5, 4*85+5, (cmdWindowWidth)/8, 80, 0, "COLOR");    // Yellow
@@ -218,25 +208,12 @@ void setup() {
   O[7] = new onoffbutton(color(255, 0, 0), 1*155+5, 5*85+5, 150, 80, 0, "Nudge -");
   //O[8] = new onoffbutton(color(255,0,0),1*155+5,4*85+5,150,80,0,"Hide (h)");
 
-  checkLicense();  //sets "licenseOK" variable to true or false.
 } 
-
-
-
-
-
-
-
-
-
-
-
 
 void draw() { 
   fill(0, map((mousePressed && !lockscreen && mouseX<frameSizeX ? 100 : shadeAmount), 0, 100, 255, 10)); 
   noStroke();
   rect(0, 0, frameSizeX, height);        // background of Beamer without (!) command window
-
 
   pushMatrix();
 
@@ -250,7 +227,6 @@ void draw() {
     }
   }
 
-
   //easing
   if (!O[1].buttonState) {      // if no Blackout
     presetBrightness += 0.2*(presetBrightnessDestination-presetBrightness);
@@ -258,10 +234,8 @@ void draw() {
 
   presetSize += 0.14*(presetSizeDestination-presetSize);
 
-
   fill  (presetColor, presetBrightness*255/100);
   stroke(presetColor, presetBrightness*255/100);
-
 
   //Line moving
   if (drawTranslateMode  &&  presetPos.size() >= 3) {
@@ -273,7 +247,6 @@ void draw() {
   }
 
   //translate(map(fromWiFi_X, 0, 16, -frameSizeX/3, frameSizeX/3), map(fromWiFi_Y, 0, 16, -height/3, height/3));  //Coordinates from Smartphone
-
 
   //BPM Sound-To-Light
   if (bpmSTLmode) {
@@ -924,15 +897,10 @@ void draw() {
     thread("getMiniImage");   //Copy animation for mini image in control window, do this in a seperate thread
   }
 
-
-
-
-
   fill(editFrameSize ? 255 : 0); 
   noStroke();
   rect(frameSizeX, 0, cmdWindowWidth, height);  // background of Control Window
   lockscreen = false;
-
 
   if (!pass.equals(realPass)) {     // Start (Lock-) screen
     lockscreen = true;
@@ -1081,9 +1049,6 @@ void draw() {
       }
     }
 
-
-
-
     // NETWORKING __________________________________________________________________________________________________________________________________  
     try {  
       CC = s.available();
@@ -1107,7 +1072,6 @@ void draw() {
           _adress = -1;
           _data   = -1;
         }
-
 
         if (_adress <= 31  &&  _data == 0) {                                                 // 0-31 Presets, 32-35 Color buttons
           S[_adress].doStuff();
@@ -1150,22 +1114,10 @@ void draw() {
   }
 }
 
-
-
-
-
-
-
-
-
 //________________________ Functions for extra Threads _______________________________//
 void getMiniImage() {
   miniImage = get(0, 0, frameSizeX, height);
 }
-
-
-
-
 
 void mousePressed() {
   if (mouseButton == LEFT) {
@@ -1488,11 +1440,6 @@ class rectbutton {
   }
 }
 
-
-
-
-
-
 class onoffbutton {
   color clr;
   int xpos, ypos, xsize, ysize, xmiddle, ymiddle, index;
@@ -1571,13 +1518,8 @@ class onoffbutton {
 }
 
 
-
-
-
-
-
-
 class slider {
+
   color bgclr, clr;
   int xpos, ypos, xsize, ysize, xmiddle, ymiddle;
   int value = 50;
@@ -1624,7 +1566,7 @@ class slider {
   }
 
   void doStuff() {
-    if     (modifier == "Speed"      ) {  
+    if (modifier == "Speed"      ) {  
       presetSpeed      = value;
     } else if (modifier == "Size"       ) {  
       presetSizeDestination       = value;
