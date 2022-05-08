@@ -80,7 +80,7 @@ PImage miniImage;
 PImage AeroTraxBall;
 
 void setup() {
-  fullScreen(2);                 // Start on primary Display, Remove Window Frame/Border
+  fullScreen(1);                 // Start on primary Display, Remove Window Frame/Border
   surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
 
   //surface.setTitle("Blaize V3 by AeroTrax");
@@ -207,7 +207,6 @@ void setup() {
   O[6] = new onoffbutton(color(255, 0, 0), 2*155+5, 5*85+5, 150, 80, 0, "Nudge +");
   O[7] = new onoffbutton(color(255, 0, 0), 1*155+5, 5*85+5, 150, 80, 0, "Nudge -");
   //O[8] = new onoffbutton(color(255,0,0),1*155+5,4*85+5,150,80,0,"Hide (h)");
-
 } 
 
 void draw() { 
@@ -1149,7 +1148,6 @@ void mousePressed() {
   }
 }
 
-
 void mouseReleased() {
   O[1].buttonState = false;    // Blackout off
 
@@ -1157,7 +1155,6 @@ void mouseReleased() {
     O[1].doStuff();
   }
 }
-
 
 void mouseMoved() {              // Mouse moved while not clicked
   hideControlWindow = false;
@@ -1169,7 +1166,6 @@ void mouseDragged() {            // Mouse moved while clicked
   hideControlWindow = false;
   lastMouseMovedTime = millis();
 }
-
 
 void keyPressed() {
   if (key != CODED) {
@@ -1194,33 +1190,23 @@ void keyPressed() {
 
     //else if(keyCode == SHIFT){
     //  editFramePos = true;
-    //}
-    
-    else if (keyCode == CONTROL  ||  keyCode == KeyEvent.VK_META) {
-      editFrameSize = true;
-    }
+    //} else if (keyCode == CONTROL  ||  keyCode == KeyEvent.VK_META) {
+    editFrameSize = true;
+  }
 
-    //if(editFramePos == true  &&  lockscreen == false){
-    //  if     (keyCode == LEFT) { framePosX = framePosX-10; }
-    //  else if(keyCode == RIGHT){ framePosX = framePosX+10; }
-    //  else if(keyCode == UP)   { framePosY = framePosY-10; }
-    //  else if(keyCode == DOWN) { framePosY = framePosY+10; }
-    
-    } if (editFrameSize) {
-      if(keyCode == LEFT) { 
-        frameSizeX = frameSizeX-10;
-      } else if (keyCode == RIGHT) { 
-        frameSizeX = frameSizeX+10;
-      } else if (keyCode == UP) { 
-        frameSizeY = frameSizeY-10;
-      } else if (keyCode == DOWN) { 
-        frameSizeY = frameSizeY+10;
-      }
-      surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
+  if (editFrameSize) {
+    if (keyCode == LEFT) { 
+      frameSizeX = frameSizeX-10;
+    } else if (keyCode == RIGHT) { 
+      frameSizeX = frameSizeX+10;
+    } else if (keyCode == UP) { 
+      frameSizeY = frameSizeY-10;
+    } else if (keyCode == DOWN) { 
+      frameSizeY = frameSizeY+10;
     }
-  //}
+    surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
+  }
 }
-
 
 void keyReleased() {
   if (key == CODED) {
@@ -1233,9 +1219,6 @@ void keyReleased() {
     }
   }
 }
-
-
-
 
 void drawQuadLED(int _x, int _y, int _bright) {
   int SIZE = round(8*(presetSize+50)/100);
@@ -1256,43 +1239,6 @@ void drawQuadLED(int _x, int _y, int _bright) {
     rect(_x+1, _y+1, _x+SIZE+1, _y+SIZE+1);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class kreis {    // PingPong-Spotlight-Balls
   float posX;
@@ -1331,11 +1277,6 @@ class kreis {    // PingPong-Spotlight-Balls
   }
 }
 
-
-
-
-
-
 class rectbutton {
   color clr;
   int xpos, ypos, xsize, ysize, xmiddle, ymiddle, index;
@@ -1353,8 +1294,6 @@ class rectbutton {
     index    = _index;
     modifier = _modifier;
   }
-
-
 
   void display() {
     if (modifier == "PRESET") {
@@ -1412,8 +1351,6 @@ class rectbutton {
       text(multiColor ? "2" : "1", xmiddle+frameSizeX, ymiddle-6);
     }
   }
-
-
 
   void doStuff() {
     if (modifier == "PRESET") {
@@ -1516,7 +1453,6 @@ class onoffbutton {
     }
   }
 }
-
 
 class slider {
 
