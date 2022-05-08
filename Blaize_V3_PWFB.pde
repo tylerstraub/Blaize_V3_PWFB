@@ -48,6 +48,8 @@ int lowerPage = 0;
 int bpmSwitchCounter = -1;
 int fromWiFi_X = 8, fromWiFi_Y = 8;
 
+int targetDisplay = 1                     // set the target monitor to display output
+
 long strobeTime, time = 0;
 long bpmSTLtime = 0;
 long time2 = 0;
@@ -80,7 +82,7 @@ PImage miniImage;
 PImage AeroTraxBall;
 
 void setup() {
-  fullScreen(1);                 // Start on primary Display, Remove Window Frame/Border
+  fullScreen(targetDisplay);
   surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
 
   //surface.setTitle("Blaize V3 by AeroTrax");
