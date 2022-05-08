@@ -67,7 +67,7 @@ boolean lockscreen = false;
 boolean flag = false;
 boolean editFramePos = false;
 boolean editFrameSize = false;
-boolean dontShowStartupScreenAnymore = false;
+boolean dontShowStartupScreenAnymore = true;
 boolean hideControlWindow = false;
 boolean licenseOK = true;
 
@@ -900,62 +900,9 @@ void draw() {
   noStroke();
   rect(frameSizeX, 0, cmdWindowWidth, height);  // background of Control Window
   lockscreen = false;
-
-  if (!pass.equals(realPass)) {     // Start (Lock-) screen
-    lockscreen = true;
-    textAlign(CENTER);
-    textSize(78); 
-    fill(0, 200, 255);
-    text("Blaize 3", frameSizeX+310, 180);
-    //textSize(40);
-    //text("©", frameSizeX+480, 140);
-    textSize(27); 
-    fill(255);
-    text("Spice up your Beamer.", frameSizeX+314, 208);
-    textSize(20); 
-    fill(255);
-    text("Please subscribe to\nBodgedButWorks on YouTube\nand follow me on instagram!\n", frameSizeX+320, 350);
-    //text("www.aerotrax.de", frameSizeX+320, 380);
-    textSize(20); 
-    fill(0, 200, 255);
-
-    for (int u=0; u<pass.length(); u++) {
-      text(random(0, 100)>50 ? "|||" : "||", frameSizeX+230+15*u, 500);
-    }
-
-    text("Please enter Password", frameSizeX+320, 550);
-
-    if (!licenseOK) {
-      textSize(frameSizeY/30); 
-      fill(255, 0, 0);
-      text("! License Error !", frameSizeX/2, frameSizeY/2);
-      noLoop();
-    }
-
-    try {                                // Get IP Adress, Handle Exceptions
-      inet = InetAddress.getLocalHost();
-      myIP = inet.getHostAddress();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      myIP = "IP not available";
-    }
-
-    textSize(20); 
-    fill(0, 200, 255);
-    text("IP: " + myIP, frameSizeX+315, 590);
-    pushMatrix();
-    rotate(-HALF_PI);
-    textSize(40); 
-    fill(255);
-    text("An AeroTrax application", -355, frameSizeX+120);
-    stroke(255); 
-    strokeWeight(5);
-    line(-592, frameSizeX+140, -120, frameSizeX+140);
-    popMatrix();
-    time2 = millis();
-    textAlign(CENTER, CENTER);
-  } else if (millis()-time2 < 8000  &&  dontShowStartupScreenAnymore == false) {
+  
+  // TRS: bypass unnecessary login screen
+  if (millis()-time2 < 8000  &&  dontShowStartupScreenAnymore == false) {
     flag = false;
     textAlign(CENTER);
     textSize(78); 
