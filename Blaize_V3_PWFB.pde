@@ -48,7 +48,7 @@ int lowerPage = 0;
 int bpmSwitchCounter = -1;
 int fromWiFi_X = 8, fromWiFi_Y = 8;
 
-int targetDisplay = 1                     // set the target monitor to display output
+int targetDisplay = 1;                   // set the target monitor to display output
 
 long strobeTime, time = 0;
 long bpmSTLtime = 0;
@@ -70,8 +70,11 @@ boolean flag = false;
 boolean editFramePos = false;
 boolean editFrameSize = false;
 boolean dontShowStartupScreenAnymore = true;
-boolean hideControlWindow = false;
+boolean hideControlWindow = true; // default hide control interface because we will be primarily using TCP interface
 boolean licenseOK = true;
+
+// TRS extra configs
+boolean disableControls = true;
 
 String pass = "";
 String realPass = "BodgedButWorks";
@@ -83,9 +86,8 @@ PImage AeroTraxBall;
 
 void setup() {
   fullScreen(targetDisplay);
+  
   surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
-
-  //surface.setTitle("Blaize V3 by AeroTrax");
 
   hint(DISABLE_DEPTH_TEST);      // Ignore Z coordinates (optical glitches, maybe caused by push/popMatrix ?), draw everything on top of each other
 
@@ -194,6 +196,7 @@ void setup() {
   //X[5] = new slider(color(30),color(80),0*155+5,7*85+5,460,80,"Dynamic");
   X[6] = new slider(color(30), color(80), 0*155+5, 6*85+5, 460, 80, "Shading");
 
+  // initial values (display only.. does not  update state)
   X[0].value = 30;   
   X[1].value = 50;   
   X[2].value = 100;   
@@ -902,7 +905,7 @@ void draw() {
   noStroke();
   rect(frameSizeX, 0, cmdWindowWidth, height);  // background of Control Window
   lockscreen = false;
-  
+
   // TRS: bypass unnecessary login screen
   if (millis()-time2 < 8000  &&  dontShowStartupScreenAnymore == false) {
     flag = false;
@@ -1008,6 +1011,9 @@ void draw() {
       String input = CC.readString();
       String[] vals1 = splitTokens(input, "C\n");
 
+      // TRS DEBUG: print to Processing message window
+      println("Client says: " + input);
+
       int _adress = -1;
       int _data   = -1;
 
@@ -1015,7 +1021,9 @@ void draw() {
         String[] vals2 = split(vals1[k], 'V');
         if (vals2.length == 2) {
           _adress = int(vals2[0]);
+          println("_adress: " + _adress);
           _data   = int(vals2[1]);
+          println("_data: " + _data);
         } else {
           _adress = -1;
           _data   = -1;
