@@ -3,6 +3,12 @@ import java.awt.AWTException;
 import processing.net.*;
 import java.net.InetAddress;
 
+//init OSC library
+import oscP5.*;
+import netP5.*;
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+
 Server s;
 Client CC;
 InetAddress inet;
@@ -82,7 +88,31 @@ String myIP;
 PImage miniImage;
 PImage AeroTraxBall;
 
+/* incoming osc message are forwarded to the oscEvent method. */
+void oscEvent(OscMessage theOscMessage) {
+  /* print the address pattern and the typetag of the received OscMessage */
+  //print("### received an osc message.");
+  //print(" addrpattern: "+theOscMessage.addrPattern());
+  //println(" typetag: "+theOscMessage.typetag());
+  if (theOscMessage.checkAddrPattern("/Blaize") == true ) {
+    println("Your attention is at: " + theOscMessage.get(0).floatValue());
+  }
+}
+
 void setup() {
+
+  /* start oscP5, listening for incoming messages at port 12000 */
+  oscP5 = new OscP5(this, 12000);
+
+  /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
+   * an ip address and a port number. myRemoteLocation is used as parameter in
+   * oscP5.send() when sending osc packets to another computer, device, 
+   * application. usage see below. for testing purposes the listening port
+   * and the port of the remote location address are the same, hence you will
+   * send messages back to this sketch.
+   */
+
+  myRemoteLocation = new NetAddress("127.0.0.1", 12000);
 
   try {
     // TRS extra configs
@@ -133,7 +163,7 @@ void setup() {
     spotlight[n] = new kreis();
   }
 
-  try {  
+  try {
     s = new Server(this, server_port);
   }
   catch(Exception e) {
@@ -1043,7 +1073,7 @@ void draw() {
       String[] vals1 = splitTokens(input, "C\n");
 
       // TRS DEBUG: print to Processing message window
-      println("TCP INPUT: " + input);
+      // println("TCP INPUT: " + input);
 
       int _adress = -1;
       int _data   = -1;
