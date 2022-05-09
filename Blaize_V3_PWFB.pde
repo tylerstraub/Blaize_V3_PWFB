@@ -54,9 +54,6 @@ int lowerPage = 0;
 int bpmSwitchCounter = -1;
 int fromWiFi_X = 8, fromWiFi_Y = 8;
 
-int targetDisplay = 1;                   // set the target monitor to display output
-int server_port = 42069;                 // designate a server port for TCP
-
 long strobeTime, time = 0;
 long bpmSTLtime = 0;
 long time2 = 0;
@@ -88,6 +85,11 @@ String myIP;
 PImage miniImage;
 PImage AeroTraxBall;
 
+// TRS globals
+int targetDisplay = 1;                   // set the target monitor to display output
+int tcp_port = 12345;                    // designate a server port for TCP
+int osc_port = 12000;                    // designate a server port for OSC
+
 // init OSC globals TODO: remove these unnecessary globals
 int note1, note2, note3, note4, note5, note6, note7, note8  = 0;
 
@@ -105,12 +107,11 @@ void oscEvent(OscMessage theOscMessage) {
     note1 = theOscMessage.get(0).intValue();
     println("NOTE 1 HAS BEEN TRIGGERED: " + note1);
   }
-  
+
   String data = "C10V0";
-  
+
   // TRS: invoke net_controller with the result data
   net_controller(data);
-
 }
 
 void net_controller(String data) {
@@ -178,19 +179,6 @@ void net_controller(String data) {
 
 void setup() {
 
-  /* start oscP5, listening for incoming messages at port 12000 */
-  oscP5 = new OscP5(this, 12000);
-
-  /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
-   * an ip address and a port number. myRemoteLocation is used as parameter in
-   * oscP5.send() when sending osc packets to another computer, device, 
-   * application. usage see below. for testing purposes the listening port
-   * and the port of the remote location address are the same, hence you will
-   * send messages back to this sketch.
-   */
-
-  myRemoteLocation = new NetAddress("127.0.0.1", 12000);
-
   try {
     // TRS extra configs
     String[] lines = loadStrings("settings.cfg");
@@ -205,9 +193,14 @@ void setup() {
         targetDisplay = parseInt(property_value);
       }
 
-      // SERVER_PORT CONFIG HANDLER
-      if (lines[i].startsWith("SERVER_PORT")) {
-        server_port = parseInt(property_value);
+      // TCP PORT CONFIG HANDLER
+      if (lines[i].startsWith("TCP_PORT")) {
+        tcp_port = parseInt(property_value);
+      }
+
+      // OSC PORT CONFIG HANDLER
+      if (lines[i].startsWith("OSC_PORT")) {
+        osc_port = parseInt(property_value);
       }
     }
   }
@@ -215,6 +208,19 @@ void setup() {
     println("settings.cfg could not be loaded...");
     // simply ignore all this logic if config file cannot be located
   }
+
+  /* start oscP5, listening for incoming messages at designated port */
+  oscP5 = new OscP5(this, osc_port);
+
+  /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
+   * an ip address and a port number. myRemoteLocation is used as parameter in
+   * oscP5.send() when sending osc packets to another computer, device, 
+   * application. usage see below. for testing purposes the listening port
+   * and the port of the remote location address are the same, hence you will
+   * send messages back to this sketch.
+   */
+
+  myRemoteLocation = new NetAddress("127.0.0.1", osc_port);
 
   // hack to fit the output to whatever the current display resolution is
   println("TRS current height: " + displayHeight);
@@ -241,7 +247,7 @@ void setup() {
   }
 
   try {
-    s = new Server(this, server_port);
+    s = new Server(this, tcp_port);
   }
   catch(Exception e) {
   }
