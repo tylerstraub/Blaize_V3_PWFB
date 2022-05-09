@@ -49,6 +49,7 @@ int bpmSwitchCounter = -1;
 int fromWiFi_X = 8, fromWiFi_Y = 8;
 
 int targetDisplay = 1;                   // set the target monitor to display output
+int server_port = 42069;                 // designate a server port for TCP
 
 long strobeTime, time = 0;
 long bpmSTLtime = 0;
@@ -96,6 +97,11 @@ void setup() {
       if (lines[i].startsWith("TARGET_DISPLAY")) {
         targetDisplay = parseInt(property_value);
       }
+
+      // SERVER_PORT CONFIG HANDLER
+      if (lines[i].startsWith("SERVER_PORT")) {
+        server_port = parseInt(property_value);
+      }
     }
   }
   catch(Exception e) {
@@ -128,7 +134,7 @@ void setup() {
   }
 
   try {  
-    s = new Server(this, 12345);
+    s = new Server(this, server_port);
   }
   catch(Exception e) {
   }
@@ -1062,8 +1068,9 @@ void draw() {
 
         //adress 33, 34, 35 now free (formerly Color Buttons Green, Blue, Random)
 
+        // TRS: wat? does not appear to actually be implemented...
         else if (_adress >= 36  &&  _adress <= 42) {                                         // onoffbuttons
-          if (_data == 1) {  
+          if (_data == 1) { 
             O[_adress-36].buttonState =  true; 
             O[_adress-36].doStuff();
           }
@@ -1078,14 +1085,16 @@ void draw() {
         else if (_adress >= 44  &&  (_adress != 48  &&  _adress != 49)  &&  _adress <= 50  &&  _data >= 0  &&  _data <= 100) {       // Sliders
           X[_adress-44].value = _data;
           X[_adress-44].doStuff();
-        } else if (_adress >= 51  &&  _adress <= 52) {                                         // Nudge +  &  Nudge -
-          if (_data == 1) {  
+        } else if (_adress >= 51  &&  _adress <= 52) {                     // Nudge +  &  Nudge -
+          // TRS: does not appear to be implemented correctly...
+          if (_data == 1) { 
             O[_adress-45].buttonState =  true; 
             O[_adress-45].doStuff();
           }
         } else if (_adress == 254  &&  _data >= 60  &&  _data <= 180) {                        // bpm set value
           bpm = _data;
-        } else if (_adress == 255) {                                                           // XY translation control
+        } else if (_adress == 255) {            // XY translation control
+          // TRS: does not appear to be implemented correctly...
           //println(binary(_data)); println(_data); print(" "); println(_data >> 16);
           fromWiFi_X = 0;
           fromWiFi_Y = 0;
