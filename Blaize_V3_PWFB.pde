@@ -38,8 +38,8 @@ int presetSizeDestination = 50;          // easing
 int presetBrightnessDestination = 100;   // easing
 int presetStrobing   = 0;                // 0 - 100
 int a, b, c, d = 0;                      // Counters used for Random Numbers
-int frameSizeX = 970;                    // width of drawin zone only (without (!) command window, 'cmdWindowWidth' pixels wide)
-int frameSizeY = 1000;                   // height of window
+int frameSizeX = 1920;                   // width of drawin zone only (without (!) command window, 'cmdWindowWidth' pixels wide)
+int frameSizeY = 1080;                   // height of window
 int cmdWindowWidth = 630;                // width of command window
 int shadeAmount = 0;
 int bpm = 128;
@@ -70,11 +70,8 @@ boolean flag = false;
 boolean editFramePos = false;
 boolean editFrameSize = false;
 boolean dontShowStartupScreenAnymore = true;
-boolean hideControlWindow = true; // default hide control interface because we will be primarily using TCP interface
+boolean hideControlWindow = false;
 boolean licenseOK = true;
-
-// TRS extra configs
-boolean disableControls = true;
 
 String pass = "";
 String realPass = "BodgedButWorks";
@@ -85,8 +82,36 @@ PImage miniImage;
 PImage AeroTraxBall;
 
 void setup() {
+
+  try {
+    // TRS extra configs
+    String[] lines = loadStrings("settings.cfg");
+
+    // TRS load in some strings from config file...
+    for (int i = 0; i < lines.length; i++) {
+
+      String property_value = lines[i].substring(lines[i].lastIndexOf("=") + 1).trim();
+
+      // TARGET_DISPLAY CONFIG HANDLER
+      if (lines[i].startsWith("TARGET_DISPLAY")) {
+        targetDisplay = parseInt(property_value);
+      }
+    }
+  }
+  catch(Exception e) {
+    println("settings.cfg could not be loaded...");
+    // simply ignore all this logic if config file cannot be located
+  }
+
+  // hack to fit the output to whatever the current display resolution is
+  println("TRS current height: " + displayHeight);
+  println("TRS current width: " + displayWidth);
+  frameSizeX = displayWidth;
+  frameSizeY = displayHeight;
+
+  // start rendering the display output...
+  println("TRS target display output is: " + targetDisplay);
   fullScreen(targetDisplay);
-  
   surface.setSize(frameSizeX+cmdWindowWidth, frameSizeY);
 
   hint(DISABLE_DEPTH_TEST);      // Ignore Z coordinates (optical glitches, maybe caused by push/popMatrix ?), draw everything on top of each other
