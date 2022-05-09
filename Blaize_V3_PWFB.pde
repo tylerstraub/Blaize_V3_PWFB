@@ -1037,7 +1037,7 @@ void draw() {
       String[] vals1 = splitTokens(input, "C\n");
 
       // TRS DEBUG: print to Processing message window
-      println("Client says: " + input);
+      println("TCP INPUT: " + input);
 
       int _adress = -1;
       int _data   = -1;

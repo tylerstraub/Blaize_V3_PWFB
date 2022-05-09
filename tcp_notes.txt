@@ -1,0 +1,44 @@
+// TRS DOCUMENTATION FOR BLAIZE EXPECTED TCP DATA STRUCTURE
+// UPDATED MAY 8, 2022
+
+- messages are split on new line (/n)
+- messages expect a C value (address registry) and a V value (data registry)
+
+// CHANGE CURRENT PRESET
+- C values of 0-31 trigger preset changes (V value must be 0)
+
+ex: 
+	C10V0 (switch to preset 10)
+
+// CHANGE COLORS
+- value 32 triggers color buttons
+- selectable V values for collers are a range from 0-7
+	0: RED
+	1: YELLOW
+	2: GREEN
+	3: CYAN
+	4: BLUE
+	5: MAGENTA
+	6: WHITE
+	7: RANDOM
+
+ex: 
+	C32V1 (change color to yellow)
+	C32V1/nC32V6 (change color to green and white when multicolor enabled)
+
+// CHANGE BUTTONS (on/off)
+- values 36-42 seem to toggle on/off buttons with value 0-1 (some do nothing?)
+	36: MULTICOLOR
+	37: BLACKOUT
+	38: BPM
+	41: LINE MOVE
+	
+// CHANGE SLIDERS
+- C values of 44-47 control the main sliders with a V range of 0-100
+	44: SPEED
+	45: SIZE
+	46: BRIGHTNESS
+	47: STROBING
+	50: SHADING
+
+
