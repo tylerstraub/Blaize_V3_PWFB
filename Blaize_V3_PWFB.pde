@@ -88,6 +88,9 @@ String myIP;
 PImage miniImage;
 PImage AeroTraxBall;
 
+// init OSC globals TODO: remove these unnecessary globals
+int note1, note2, note3, note4, note5, note6, note7, note8  = 0;
+
 /* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage theOscMessage) {
   /* print the address pattern and the typetag of the received OscMessage */
@@ -96,6 +99,80 @@ void oscEvent(OscMessage theOscMessage) {
   //println(" typetag: "+theOscMessage.typetag());
   if (theOscMessage.checkAddrPattern("/Blaize") == true ) {
     println("Your attention is at: " + theOscMessage.get(0).floatValue());
+  }
+
+  if (theOscMessage.checkAddrPattern("/Note1")==true) {
+    note1 = theOscMessage.get(0).intValue();
+    println("NOTE 1 HAS BEEN TRIGGERED: " + note1);
+  }
+  
+  String data = "C10V0";
+  
+  // TRS: invoke net_controller with the result data
+  net_controller(data);
+
+}
+
+void net_controller(String data) {
+
+  // TRS DEBUG: print to Processing message window
+  // println("net_controller input: " + data);
+
+  String[] vals1 = splitTokens(data, "C\n");
+
+  int _adress = -1;
+  int _data   = -1;
+
+  for (int k=0; k<vals1.length; k++) {
+    String[] vals2 = split(vals1[k], 'V');
+    if (vals2.length == 2) {
+      _adress = int(vals2[0]);
+      println("_adress: " + _adress);
+      _data   = int(vals2[1]);
+      println("_data: " + _data);
+    } else {
+      _adress = -1;
+      _data   = -1;
+    }
+
+    if (_adress <= 31  &&  _data == 0) {                                                 // 0-31 Presets, 32-35 Color buttons
+      S[_adress].doStuff();
+    } else if (_adress == 32  &&  _data >= 0  &&  _data <= 7) {                            // Color Buttons 0-7
+      S[32+_data].doStuff();
+    }
+
+    //adress 33, 34, 35 now free (formerly Color Buttons Green, Blue, Random)
+
+    // TRS: wat? does not appear to actually be implemented...
+    else if (_adress >= 36  &&  _adress <= 42) {                                         // onoffbuttons
+      if (_data == 1) { 
+        O[_adress-36].buttonState =  true; 
+        O[_adress-36].doStuff();
+      }
+      if (_data == 0) {  
+        O[_adress-36].buttonState = false; 
+        O[_adress-36].doStuff();
+      }
+    }
+
+    // Adress 43 is currently free
+    else if (_adress >= 44  &&  (_adress != 48  &&  _adress != 49)  &&  _adress <= 50  &&  _data >= 0  &&  _data <= 100) {       // Sliders
+      X[_adress-44].value = _data;
+      X[_adress-44].doStuff();
+    } else if (_adress >= 51  &&  _adress <= 52) {                     // Nudge +  &  Nudge -
+      // TRS: does not appear to be implemented correctly...
+      if (_data == 1) { 
+        O[_adress-45].buttonState =  true; 
+        O[_adress-45].doStuff();
+      }
+    } else if (_adress == 254  &&  _data >= 60  &&  _data <= 180) {                        // bpm set value
+      bpm = _data;
+    } else if (_adress == 255) {            // XY translation control
+      // TRS: does not appear to be implemented correctly...
+      //println(binary(_data)); println(_data); print(" "); println(_data >> 16);
+      fromWiFi_X = 0;
+      fromWiFi_Y = 0;
+    }  //Aufteilung von 32 bit auf 2 x 16 bit (0-32768) für X & Y
   }
 }
 
@@ -1062,74 +1139,17 @@ void draw() {
     }
 
     // NETWORKING __________________________________________________________________________________________________________________________________  
-    try {  
+    try {
       CC = s.available();
     }   // Receive data from WiFi Console
     catch(Exception e) {
     }
 
     if (CC != null) {
-      String input = CC.readString();
-      String[] vals1 = splitTokens(input, "C\n");
+      String data = CC.readString();
 
-      // TRS DEBUG: print to Processing message window
-      // println("TCP INPUT: " + input);
-
-      int _adress = -1;
-      int _data   = -1;
-
-      for (int k=0; k<vals1.length; k++) {
-        String[] vals2 = split(vals1[k], 'V');
-        if (vals2.length == 2) {
-          _adress = int(vals2[0]);
-          println("_adress: " + _adress);
-          _data   = int(vals2[1]);
-          println("_data: " + _data);
-        } else {
-          _adress = -1;
-          _data   = -1;
-        }
-
-        if (_adress <= 31  &&  _data == 0) {                                                 // 0-31 Presets, 32-35 Color buttons
-          S[_adress].doStuff();
-        } else if (_adress == 32  &&  _data >= 0  &&  _data <= 7) {                            // Color Buttons 0-7
-          S[32+_data].doStuff();
-        }
-
-        //adress 33, 34, 35 now free (formerly Color Buttons Green, Blue, Random)
-
-        // TRS: wat? does not appear to actually be implemented...
-        else if (_adress >= 36  &&  _adress <= 42) {                                         // onoffbuttons
-          if (_data == 1) { 
-            O[_adress-36].buttonState =  true; 
-            O[_adress-36].doStuff();
-          }
-          if (_data == 0) {  
-            O[_adress-36].buttonState = false; 
-            O[_adress-36].doStuff();
-          }
-        }
-
-        // Adress 43 is currently free
-
-        else if (_adress >= 44  &&  (_adress != 48  &&  _adress != 49)  &&  _adress <= 50  &&  _data >= 0  &&  _data <= 100) {       // Sliders
-          X[_adress-44].value = _data;
-          X[_adress-44].doStuff();
-        } else if (_adress >= 51  &&  _adress <= 52) {                     // Nudge +  &  Nudge -
-          // TRS: does not appear to be implemented correctly...
-          if (_data == 1) { 
-            O[_adress-45].buttonState =  true; 
-            O[_adress-45].doStuff();
-          }
-        } else if (_adress == 254  &&  _data >= 60  &&  _data <= 180) {                        // bpm set value
-          bpm = _data;
-        } else if (_adress == 255) {            // XY translation control
-          // TRS: does not appear to be implemented correctly...
-          //println(binary(_data)); println(_data); print(" "); println(_data >> 16);
-          fromWiFi_X = 0;
-          fromWiFi_Y = 0;
-        }  //Aufteilung von 32 bit auf 2 x 16 bit (0-32768) für X & Y
-      }
+      // TRS: pass the data and invoke net_controller method...
+      net_controller(data);
     }
   }
 }
