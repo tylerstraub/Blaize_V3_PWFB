@@ -86,9 +86,9 @@ PImage miniImage;
 PImage AeroTraxBall;
 
 // TRS globals
-int targetDisplay = 1;                   // set the target monitor to display output
-int tcp_port = 12345;                    // designate a server port for TCP
-int osc_port = 12000;                    // designate a server port for OSC
+int targetDisplay = 2;                       // set the target monitor to display output
+int tcp_port = 17017;                    // designate a server port for TCP
+int osc_port = 42069;                    // designate a server port for OSC
 
 // init OSC globals TODO: remove these unnecessary globals
 int note1, note2, note3, note4, note5, note6, note7, note8  = 0;
@@ -100,7 +100,10 @@ void oscEvent(OscMessage theOscMessage) {
   //print(" addrpattern: "+theOscMessage.addrPattern());
   //println(" typetag: "+theOscMessage.typetag());
   if (theOscMessage.checkAddrPattern("/Blaize") == true ) {
-    println("Your attention is at: " + theOscMessage.get(0).floatValue());
+
+    float float_value = theOscMessage.get(0).floatValue() * 100;
+    int rounded_value = Math.round(float_value);
+    println("Your attention is at: " + rounded_value);
   }
 
   if (theOscMessage.checkAddrPattern("/Note1")==true) {
@@ -111,7 +114,7 @@ void oscEvent(OscMessage theOscMessage) {
   String data = "C10V0";
 
   // TRS: invoke net_controller with the result data
-  net_controller(data);
+  //net_controller(data);
 }
 
 void net_controller(String data) {
@@ -179,36 +182,6 @@ void net_controller(String data) {
 
 void setup() {
 
-  try {
-    // TRS extra configs
-    String[] lines = loadStrings("settings.cfg");
-
-    // TRS load in some strings from config file...
-    for (int i = 0; i < lines.length; i++) {
-
-      String property_value = lines[i].substring(lines[i].lastIndexOf("=") + 1).trim();
-
-      // TARGET_DISPLAY CONFIG HANDLER
-      if (lines[i].startsWith("TARGET_DISPLAY")) {
-        targetDisplay = parseInt(property_value);
-      }
-
-      // TCP PORT CONFIG HANDLER
-      if (lines[i].startsWith("TCP_PORT")) {
-        tcp_port = parseInt(property_value);
-      }
-
-      // OSC PORT CONFIG HANDLER
-      if (lines[i].startsWith("OSC_PORT")) {
-        osc_port = parseInt(property_value);
-      }
-    }
-  }
-  catch(Exception e) {
-    println("settings.cfg could not be loaded...");
-    // simply ignore all this logic if config file cannot be located
-  }
-
   /* start oscP5, listening for incoming messages at designated port */
   oscP5 = new OscP5(this, osc_port);
 
@@ -222,12 +195,12 @@ void setup() {
 
   myRemoteLocation = new NetAddress("127.0.0.1", osc_port);
 
-  // hack to fit the output to whatever the current display resolution is
+  // hack to fit the output to whatever the current display resolution is (by default)
   println("TRS current height: " + displayHeight);
   println("TRS current width: " + displayWidth);
   frameSizeX = displayWidth;
   frameSizeY = displayHeight;
-
+  
   // start rendering the display output...
   println("TRS target display output is: " + targetDisplay);
   fullScreen(targetDisplay);
