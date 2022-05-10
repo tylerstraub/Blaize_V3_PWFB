@@ -90,31 +90,181 @@ int targetDisplay = 2;                       // set the target monitor to displa
 int tcp_port = 17017;                    // designate a server port for TCP
 int osc_port = 42069;                    // designate a server port for OSC
 
-// init OSC globals TODO: remove these unnecessary globals
-int note1, note2, note3, note4, note5, note6, note7, note8  = 0;
+// COLOR BANK (sorry for this...)
+String[] color_bank = {
+  // single colors
+  "C32V0", 
+  "C32V1", 
+  "C32V2", 
+  "C32V3", 
+  "C32V4", 
+  "C32V5", 
+  "C32V6", 
+  "C32V7", 
+  // 0: red combos
+  "C32V0/nC32V1", 
+  "C32V0/nC32V2", 
+  "C32V0/nC32V3", 
+  "C32V0/nC32V4", 
+  "C32V0/nC32V5", 
+  "C32V0/nC32V6", 
+  // 1: yellow combos
+  "C32V1/nC32V0", 
+  "C32V1/nC32V2", 
+  "C32V1/nC32V3", 
+  "C32V1/nC32V4", 
+  "C32V1/nC32V5", 
+  "C32V1/nC32V6", 
+  // 2: green combos
+  "C32V2/nC32V0", 
+  "C32V2/nC32V1", 
+  "C32V2/nC32V3", 
+  "C32V2/nC32V4", 
+  "C32V2/nC32V5", 
+  "C32V2/nC32V6", 
+  // 3: cyan combos
+  "C32V3/nC32V0", 
+  "C32V3/nC32V1", 
+  "C32V3/nC32V2", 
+  "C32V3/nC32V4", 
+  "C32V3/nC32V5", 
+  "C32V3/nC32V6", 
+  // 4: blue combos
+  "C32V4/nC32V0", 
+  "C32V4/nC32V1", 
+  "C32V4/nC32V2", 
+  "C32V4/nC32V3", 
+  "C32V4/nC32V5", 
+  "C32V4/nC32V6", 
+  // 5: magenta combos
+  "C32V5/nC32V0", 
+  "C32V5/nC32V1", 
+  "C32V5/nC32V2", 
+  "C32V5/nC32V3", 
+  "C32V5/nC32V4", 
+  "C32V5/nC32V6", 
+  // 6: white combos
+  "C32V6/nC32V0", 
+  "C32V6/nC32V1", 
+  "C32V6/nC32V2", 
+  "C32V6/nC32V3", 
+  "C32V6/nC32V4", 
+  "C32V6/nC32V5", 
+};
 
 /* incoming osc message are forwarded to the oscEvent method. */
 void oscEvent(OscMessage theOscMessage) {
-  /* print the address pattern and the typetag of the received OscMessage */
-  //print("### received an osc message.");
-  //print(" addrpattern: "+theOscMessage.addrPattern());
-  //println(" typetag: "+theOscMessage.typetag());
-  if (theOscMessage.checkAddrPattern("/Blaize") == true ) {
 
-    float float_value = theOscMessage.get(0).floatValue() * 100;
-    int rounded_value = Math.round(float_value);
-    println("Your attention is at: " + rounded_value);
+  if (theOscMessage.checkAddrPattern("/note")==true) {
+    int note, velo = 0;
+    note = theOscMessage.get(0).intValue();
+    velo = theOscMessage.get(1).intValue();
+    if (note >= 0 && note <= 31) {
+      // DESIGNATED RANGE FOR PRESET BANKS
+      String CMSG = Integer.toString(note);
+      String VMSG = "0";
+      String data = "C"+CMSG+"V"+VMSG;
+      // invoke net controller with constructed message
+      //println("OUTPUT DATA:" + data);
+      net_controller(data);
+    } else if (note >= 36 && note <= 42) {
+      // DESIGNATED RANGE FOR BUTTON CHANGES
+      String CMSG = Integer.toString(note); // toggle buttons
+      String VMSG = "0";
+      // ON for velocities higher than 64...
+      if (velo > 64) {
+        VMSG = "1";
+      }
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      //println("BUTTON TOGGLE:" + data);
+      net_controller(data);
+    } else if (note >= 78 && note <= 127) {
+      // DESIGNATED RANGE FOR COLOR BANKS
+      if (note >= 78 && note <= 85) {
+        // DISABLE MULTICOLOR SWITCH FOR SINGLE COLOR BANKS
+        String data = "C36V0";
+        net_controller(data);
+        // SEND COLOR CHANGE
+        data = color_bank[note - 78]; // start at 78, walk up the array for 50 possible banks
+        //println("OUTPUT NOTE:" + note);
+        //println("OUTPUT DATA:" + data);
+        net_controller(data);
+      } else {
+        // ENABLE MULTICOLOR SWITCH FOR SINGLE COLOR BANKS
+        String data = "C36V1";
+        net_controller(data);
+        // SEND COLOR CHANGE
+        data = color_bank[note - 78]; // start at 78, walk up the array for 50 possible banks
+        //println("OUTPUT NOTE:" + note);
+        //println("OUTPUT DATA:" + data);
+        net_controller(data);
+      }
+    }
+  } else {
+
+    if (theOscMessage.checkAddrPattern("/speed") == true ) {
+      float float_value = theOscMessage.get(0).floatValue() * 100;
+      int rounded_value = Math.round(float_value);
+      String CMSG = "44"; // speed registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
+
+    if (theOscMessage.checkAddrPattern("/size") == true ) {
+      float float_value = theOscMessage.get(0).floatValue() * 100;
+      int rounded_value = Math.round(float_value);
+      String CMSG = "45"; // size registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
+
+    if (theOscMessage.checkAddrPattern("/brightness") == true ) {
+      float float_value = theOscMessage.get(0).floatValue() * 100;
+      int rounded_value = Math.round(float_value);
+      String CMSG = "46"; // brightness registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
+
+    if (theOscMessage.checkAddrPattern("/strobing") == true ) {
+      float float_value = theOscMessage.get(0).floatValue() * 100;
+      int rounded_value = Math.round(float_value);
+      String CMSG = "47"; // strobing registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
+
+    if (theOscMessage.checkAddrPattern("/shading") == true ) {
+      float float_value = theOscMessage.get(0).floatValue() * 100;
+      int rounded_value = Math.round(float_value);
+      String CMSG = "50"; // shading registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
+
+    if (theOscMessage.checkAddrPattern("/bpm") == true ) {
+      //println("FLOAT OUTPUT: " + Float.toString(theOscMessage.get(0).floatValue()));
+      float float_value = (theOscMessage.get(0).floatValue() * 1000) + 19; // an absolute bodge... close enough for Ableton
+      int rounded_value = Math.round(float_value);
+      //println("ROUNDED OUTPUT: " + Integer.toString(rounded_value));
+      String CMSG = "254"; // bpm registry
+      String VMSG = Integer.toString(rounded_value);
+      // invoke net controller with constructed message
+      String data = "C"+CMSG+"V"+VMSG;
+      net_controller(data);
+    }
   }
-
-  if (theOscMessage.checkAddrPattern("/Note1")==true) {
-    note1 = theOscMessage.get(0).intValue();
-    println("NOTE 1 HAS BEEN TRIGGERED: " + note1);
-  }
-
-  String data = "C10V0";
-
-  // TRS: invoke net_controller with the result data
-  //net_controller(data);
 }
 
 void net_controller(String data) {
@@ -131,9 +281,9 @@ void net_controller(String data) {
     String[] vals2 = split(vals1[k], 'V');
     if (vals2.length == 2) {
       _adress = int(vals2[0]);
-      println("_adress: " + _adress);
+      //println("_adress: " + _adress);
       _data   = int(vals2[1]);
-      println("_data: " + _data);
+      //println("_data: " + _data);
     } else {
       _adress = -1;
       _data   = -1;
@@ -169,7 +319,7 @@ void net_controller(String data) {
         O[_adress-45].buttonState =  true; 
         O[_adress-45].doStuff();
       }
-    } else if (_adress == 254  &&  _data >= 60  &&  _data <= 180) {                        // bpm set value
+    } else if (_adress == 254  &&  _data >= 20  &&  _data <= 999) {                        // bpm set value
       bpm = _data;
     } else if (_adress == 255) {            // XY translation control
       // TRS: does not appear to be implemented correctly...
@@ -200,7 +350,7 @@ void setup() {
   println("TRS current width: " + displayWidth);
   frameSizeX = displayWidth;
   frameSizeY = displayHeight;
-  
+
   // start rendering the display output...
   println("TRS target display output is: " + targetDisplay);
   fullScreen(targetDisplay);

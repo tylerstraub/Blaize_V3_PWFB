@@ -14,7 +14,7 @@ ex:
 - value 32 triggers color buttons
 - selectable V values for collers are a range from 0-7
 	0: RED
-	1: YELLOW
+	1: YELOW
 	2: GREEN
 	3: CYAN
 	4: BLUE
@@ -30,7 +30,7 @@ ex:
 - values 36-42 seem to toggle on/off buttons with value 0-1 (some do nothing?)
 	36: MULTICOLOR
 	37: BLACKOUT
-	38: BPM
+	38: BPM (toggle on/off)
 	41: LINE MOVE
 	
 // CHANGE SLIDERS
@@ -41,4 +41,8 @@ ex:
 	47: STROBING
 	50: SHADING
 
+// CHANGE BPM
+- C value of 254, v value of target BPM
 
+ex:
+	C254V120 (set bpm to 120)
