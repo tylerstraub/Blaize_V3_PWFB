@@ -59,7 +59,7 @@ long bpmSTLtime = 0;
 long time2 = 0;
 long lastMouseMovedTime = 0;
 
-float m, v;                   // Counters used for Rotation etc.
+float m, v;                    // Counters used for Rotation etc.
 float translateCounter;
 float presetBrightness = 100;  // 0 - 100
 float presetSize       =  50;  // 0 - 100
@@ -86,7 +86,7 @@ PImage miniImage;
 PImage AeroTraxBall;
 
 // TRS globals
-int targetDisplay = 2;                       // set the target monitor to display output
+int targetDisplay = 1;                   // set the target monitor to display output
 int tcp_port = 17017;                    // designate a server port for TCP
 int osc_port = 42069;                    // designate a server port for OSC
 
@@ -445,7 +445,6 @@ void setup() {
   page2presetPix.endDraw();
 
   //QuadPhaseLED = createGraphics(20, 20);
-
   S[32] = new rectbutton(color(255, 0, 0), 0*(cmdWindowWidth-10)/8+5, 4*85+5, (cmdWindowWidth)/8, 80, 0, "COLOR");    // Red
   S[33] = new rectbutton(color(255, 255, 0), 1*(cmdWindowWidth-10)/8+5, 4*85+5, (cmdWindowWidth)/8, 80, 0, "COLOR");    // Yellow
   S[34] = new rectbutton(color(  0, 255, 0), 2*(cmdWindowWidth-10)/8+5, 4*85+5, (cmdWindowWidth)/8, 80, 0, "COLOR");    // Green
